@@ -18,12 +18,12 @@ y=df.iloc[:,2]  # Target vals
 plt.figure(figsize=(6,6))
 plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
 plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
-plt.xlabel("X1")
-plt.ylabel("X2")
-plt.title("Question A - Part I")
-plt.legend()
-plt.grid(False)
-plt.show()
+#plt.xlabel("X1")
+#plt.ylabel("X2")
+#plt.title("Question A - Part I")
+#plt.legend()
+#plt.grid(False)
+#plt.show()
 
 # PART II - https://youtube.com/shorts/8it0yrJzQfU?si=1UoVpwNGf7flDZeh
 # Test sizes from 0.1 to 0.95 in steps of 0.5
@@ -50,4 +50,30 @@ for ts in test_sizes:
     print("Accuracy:", round(accuracy_score(y_test, y_pred),2))
     accuracy_dict[round(ts, 2)] = round(accuracy_score(y_test, y_pred),2)
 print("\nAccuracy Dictionary",accuracy_dict)
+
+# PART III - https://youtu.be/ZsM2z0pTbnk?si=iMnwQTl_QFWL7ani
+
+# Use prediction on full X dataset, not just X_test
+y_pred_full = classifier.predict(X)
+
+#Add predictions to plot
+plt.scatter(X1[(y == y_pred_full) & (y == 1)], X2[(y == y_pred_full) & (y == 1)], facecolors='none', edgecolors='magenta', s=100, label="Predicted +1 (correct)")
+plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='red', s=100, label="Predicted -1 (correct)")
+
+# Add decision boundary as line on plot
+b0 = classifier.intercept_[0]
+b1, b2 = classifier.coef_[0]
+x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
+y_vals = -(b0 + b1 * x_vals) / b2
+plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary")
+
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Question A")
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.tight_layout() 
+plt.grid(False)
+plt.show()
+
+
 # QUESTION B
