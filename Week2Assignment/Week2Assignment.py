@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.svm import SVC 
+
 df = pd.read_csv("Week2Assignment/week2.php.csv",header=None,comment="#",sep=",",skipinitialspace=True)
 print(df.head())
 X1=df.iloc[:,0] # Col1
@@ -75,5 +77,16 @@ plt.tight_layout()
 plt.grid(False)
 plt.show()
 
+# PART IV - SEE REPORT PDF
 
 # QUESTION B
+
+# PART I - https://youtu.be/kPkwf1x7zpU?si=z3680NVTyFd0b_h4
+svcScoreDictionary={}
+cVals=[0.001,1,100]
+
+for cVal in cVals:
+    model = SVC(C=cVal)
+    model.fit(X_train,y_train)
+    svcScoreDictionary[round(cVal,3)] = round(model.score(X_test,y_test),2)
+print("Scores for SVC:", svcScoreDictionary)
