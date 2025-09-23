@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.svm import SVC 
+from sklearn.svm import LinearSVC 
 
 df = pd.read_csv("Week2Assignment/week2.php.csv",header=None,comment="#",sep=",",skipinitialspace=True)
 print(df.head())
@@ -20,12 +20,12 @@ y=df.iloc[:,2]  # Target vals
 plt.figure(figsize=(6,6))
 plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
 plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
-#plt.xlabel("X1")
-#plt.ylabel("X2")
-#plt.title("Question A - Part I")
-#plt.legend()
-#plt.grid(False)
-#plt.show()
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Question A - Part I")
+plt.legend()
+plt.grid(False)
+plt.show()
 
 # PART II - https://youtube.com/shorts/8it0yrJzQfU?si=1UoVpwNGf7flDZeh
 # Test sizes from 0.1 to 0.95 in steps of 0.5
@@ -59,8 +59,11 @@ print("\nAccuracy Dictionary",accuracy_dict)
 y_pred_full = classifier.predict(X)
 
 #Add predictions to plot
-plt.scatter(X1[(y == y_pred_full) & (y == 1)], X2[(y == y_pred_full) & (y == 1)], facecolors='none', edgecolors='magenta', s=100, label="Predicted +1 (correct)")
-plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='red', s=100, label="Predicted -1 (correct)")
+plt.figure(figsize=(6,6))
+plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
+plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
+plt.scatter(X1[(y == y_pred_full) & (y == 1)], X2[(y == y_pred_full) & (y == 1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted +1")
+plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted -1")
 
 # Add decision boundary as line on plot
 b0 = classifier.intercept_[0]
@@ -71,7 +74,7 @@ plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary"
 
 plt.xlabel("X1")
 plt.ylabel("X2")
-plt.title("Question A")
+plt.title("Question A - Part III")
 plt.legend(bbox_to_anchor=(1, 0.5))
 plt.tight_layout() 
 plt.grid(False)
@@ -85,8 +88,100 @@ plt.show()
 svcScoreDictionary={}
 cVals=[0.001,1,100]
 
-for cVal in cVals:
-    model = SVC(C=cVal)
-    model.fit(X_train,y_train)
+modelZero =LinearSVC(C=0.001)
+modelOne=LinearSVC(C=1)
+modelHundred   =LinearSVC(C=100)
+modelZero.fit(X_train, y_train)
+modelOne.fit(X_train, y_train)
+modelHundred.fit(X_train, y_train)
+models = {
+    0.001: modelZero,
+    1: modelOne,
+    100: modelHundred
+}
+
+for cVal, model in models.items():
     svcScoreDictionary[round(cVal,3)] = round(model.score(X_test,y_test),2)
-print("Scores for SVC:", svcScoreDictionary)
+    # Print model parameters
+    print(f"\nLinear SVC Model for C = {cVal}")
+    print("Support vectors (first 5):\n", model.coef_[0][:5])
+    print("Intercept:", model.intercept_)
+
+print("\nScores for Linear SVC:", svcScoreDictionary)
+
+# PART II 
+# Use prediction on full X dataset, not just X_test
+y_pred_Zero=modelZero.predict(X)
+y_pred_One=modelOne.predict(X)
+y_pred_Hundred=modelHundred.predict(X)
+
+# PART III
+
+b0_zero = modelZero.intercept_[0]
+b1_zero, b2_zero = modelZero.coef_[0]
+
+b0_one = modelOne.intercept_[0]
+b1_one, b2_one = modelOne.coef_[0]
+
+b0_hundred = modelHundred.intercept_[0]
+b1_hundred, b2_hundred = modelHundred.coef_[0]
+
+# Add decision boundary as line on plot
+x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
+y_vals_Zero = -(b0_zero + b1_zero * x_vals) / b2_zero
+
+x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
+y_vals_One = -(b0_one + b1_one * x_vals) / b2_one
+
+x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
+y_vals_Hundred = -(b0_hundred + b1_hundred * x_vals) / b2_hundred
+
+
+plt.figure(figsize=(6,6))
+plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
+plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
+plt.scatter(X1[(y == y_pred_Zero) & (y == 1)], X2[(y == y_pred_Zero) & (y == 1)],facecolors='none', edgecolors='red', s=100, label="Predicted +1")
+plt.scatter(X1[(y == y_pred_Zero) & (y == -1)], X2[(y == y_pred_Zero) & (y == -1)],facecolors='none', edgecolors='red', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for C=0.001")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Question B - Part III Where C=0.001")
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.grid(False)
+plt.tight_layout() 
+plt.show()
+
+plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
+plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
+plt.scatter(X1[(y == y_pred_One) & (y == 1)], X2[(y == y_pred_One) & (y == 1)],facecolors='none', edgecolors='gold', s=100, label="Predicted +1")
+plt.scatter(X1[(y == y_pred_One) & (y == -1)], X2[(y == y_pred_One) & (y == -1)],facecolors='none', edgecolors='gold', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for C=1")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Question B - Part III Where C=1")
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.grid(False)
+plt.tight_layout() 
+plt.show()
+
+plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
+plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
+plt.scatter(X1[(y == y_pred_Hundred) & (y == 1)], X2[(y == y_pred_Hundred) & (y == 1)],facecolors='none', edgecolors='brown', s=100, label="Predicted +1")
+plt.scatter(X1[(y == y_pred_Hundred) & (y == -1)], X2[(y == y_pred_Hundred) & (y == -1)],facecolors='none', edgecolors='brown', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for C=100")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("C=100")
+plt.legend()
+plt.grid(False)
+plt.title("Question B - Part III Where C=100")
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.tight_layout() 
+plt.grid(False)
+plt.show()
+
+# PART IV - SEE REPORT PDF
+
+# QUESTION C
+
+# PART I
