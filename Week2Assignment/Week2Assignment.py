@@ -185,3 +185,19 @@ plt.show()
 # QUESTION C
 
 # PART I
+X1Square=X1**2
+X2Square=X2**2
+XSquare=np.column_stack((X1,X2,X1Square,X2Square)) # Stack into 4D array
+X_trainSquare,X_testSquare,y_trainSquare,y_testSquare = train_test_split(XSquare,y,test_size=0.2,random_state=0)
+
+classifierSquare=LogisticRegression(random_state=0)
+classifierSquare.fit(X_trainSquare,y_trainSquare)
+
+y_predSquare = classifierSquare.predict(X_testSquare)
+
+print("Squared Logistic Regression Model Parameters:")
+print("Intercept (b0):", classifierSquare.intercept_[0])
+print("Coefficients (b1, b2, b1^2, b2^2):", classifierSquare.coef_[0])
+
+accuracySquare = accuracy_score(y_testSquare, y_predSquare)
+print("Test Accuracy:", round(accuracySquare, 2))
