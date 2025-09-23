@@ -171,9 +171,6 @@ plt.scatter(X1[(y == y_pred_Hundred) & (y == -1)], X2[(y == y_pred_Hundred) & (y
 plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for C=100")
 plt.xlabel("X1")
 plt.ylabel("X2")
-plt.title("C=100")
-plt.legend()
-plt.grid(False)
 plt.title("Question B - Part III Where C=100")
 plt.legend(bbox_to_anchor=(1, 0.5))
 plt.tight_layout() 
@@ -189,6 +186,8 @@ X1Square=X1**2
 X2Square=X2**2
 XSquare=np.column_stack((X1,X2,X1Square,X2Square)) # Stack into 4D array
 X_trainSquare,X_testSquare,y_trainSquare,y_testSquare = train_test_split(XSquare,y,test_size=0.2,random_state=0)
+X1_test = X_testSquare[:, 0]
+X2_test = X_testSquare[:, 1]
 
 classifierSquare=LogisticRegression(random_state=0)
 classifierSquare.fit(X_trainSquare,y_trainSquare)
@@ -201,3 +200,18 @@ print("Coefficients (b1, b2, b1^2, b2^2):", classifierSquare.coef_[0])
 
 accuracySquare = accuracy_score(y_testSquare, y_predSquare)
 print("Test Accuracy:", round(accuracySquare, 2))
+
+# PART II
+# Original Data - NOT squared
+plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
+plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
+
+plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)],facecolors='none', edgecolors='teal', s=100, label="Predicted +1")
+plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)],facecolors='none', edgecolors='teal', s=100, label="Predicted -1")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Question C - Part II - Sqaured Prediction Against Original Values")
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.tight_layout() 
+plt.grid(False)
+plt.show()
