@@ -18,7 +18,7 @@ y=df.iloc[:,2]  # Target vals
 
 # QUESTION A
 # PART I 
-plt.figure(figsize=(6,6))
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
 plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
 plt.xlabel("X1")
@@ -60,18 +60,18 @@ print("\nAccuracy Dictionary",accuracy_dict)
 y_pred_full = classifier.predict(X)
 
 #Add predictions to plot
-plt.figure(figsize=(6,6))
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
 plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
 plt.scatter(X1[(y == y_pred_full) & (y == 1)], X2[(y == y_pred_full) & (y == 1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted +1")
-plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted -1")
+plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='darkred', s=100, label="Classifier Predicted -1")
 
 # Add decision boundary as line on plot
 b0 = classifier.intercept_[0]
 b1, b2 = classifier.coef_[0]
 x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals = -(b0 + b1 * x_vals) / b2
-plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary")
+plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary for Logistic Regression Classifier")
 
 plt.xlabel("X1")
 plt.ylabel("X2")
@@ -140,12 +140,12 @@ x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals_Hundred = -(b0_hundred + b1_hundred * x_vals) / b2_hundred
 
 
-plt.figure(figsize=(6,6))
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
-plt.scatter(X1[(y == y_pred_Zero) & (y == 1)], X2[(y == y_pred_Zero) & (y == 1)],facecolors='none', edgecolors='red', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_Zero) & (y == -1)], X2[(y == y_pred_Zero) & (y == -1)],facecolors='none', edgecolors='red', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for C=0.001")
+plt.scatter(X1[(y == y_pred_Zero) & (y == 1)], X2[(y == y_pred_Zero) & (y == 1)],facecolors='none', edgecolors='orange', s=100, label="Predicted +1")
+plt.scatter(X1[(y == y_pred_Zero) & (y == -1)], X2[(y == y_pred_Zero) & (y == -1)],facecolors='none', edgecolors='darkorange', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=0.001")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=0.001")
@@ -154,11 +154,12 @@ plt.grid(False)
 plt.tight_layout() 
 plt.show()
 
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
 plt.scatter(X1[(y == y_pred_One) & (y == 1)], X2[(y == y_pred_One) & (y == 1)],facecolors='none', edgecolors='gold', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_One) & (y == -1)], X2[(y == y_pred_One) & (y == -1)],facecolors='none', edgecolors='gold', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for C=1")
+plt.scatter(X1[(y == y_pred_One) & (y == -1)], X2[(y == y_pred_One) & (y == -1)],facecolors='none', edgecolors='yellow', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=1")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=1")
@@ -167,11 +168,12 @@ plt.grid(False)
 plt.tight_layout() 
 plt.show()
 
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
 plt.scatter(X1[(y == y_pred_Hundred) & (y == 1)], X2[(y == y_pred_Hundred) & (y == 1)],facecolors='none', edgecolors='brown', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_Hundred) & (y == -1)], X2[(y == y_pred_Hundred) & (y == -1)],facecolors='none', edgecolors='brown', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for C=100")
+plt.scatter(X1[(y == y_pred_Hundred) & (y == -1)], X2[(y == y_pred_Hundred) & (y == -1)],facecolors='none', edgecolors='fuchsia', s=100, label="Predicted -1")
+plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=100")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=100")
@@ -206,11 +208,12 @@ print("Test Accuracy:", round(accuracySquare, 2))
 
 # PART II
 # Original Data - NOT squared
+plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
 
 plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)],facecolors='none', edgecolors='teal', s=100, label="Predicted +1")
-plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)],facecolors='none', edgecolors='teal', s=100, label="Predicted -1")
+plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)],facecolors='none', edgecolors='aqua', s=100, label="Predicted -1")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question C - Part II - Sqaured Prediction Against Original Values")
@@ -229,3 +232,25 @@ print("Baseline Accuracy (majority class predictor):", round(baselineAccuracy, 2
 print("Squared Logistic Regression Accuracy:", round(accuracySquare, 2))
 
 # PART IV - Create the decision boundary 
+b0c = classifierSquare.intercept_[0]
+b1c, b2c, b1csquared, b2csquared = classifierSquare.coef_[0]
+x1_range = np.linspace(X1.min() - 1, X1.max() + 1, 200)
+x2_range = np.linspace(X2.min() - 1, X2.max() + 1, 200)
+X1_grid, X2_grid = np.meshgrid(x1_range, x2_range)
+
+
+linearCombination = b0c + b1c*X1_grid + b2c*X2_grid + b1csquared*X1_grid**2 + b2csquared*X2_grid**2
+prob = 1 / (1 + np.exp(-linearCombination))
+plt.figure(figsize=(12,12))
+plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
+plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)],facecolors='none', edgecolors='teal', s=100, label="Predicted +1")
+plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)],facecolors='none', edgecolors='aqua', s=100, label="Predicted -1")
+plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
+plt.contour(X1_grid, X2_grid, prob, levels=[0.5], colors='black', linewidths=2, label="Decision Boundary for Squared Logistic Regression")
+plt.xlabel('X1')
+plt.ylabel('X2')
+plt.title('Question C - Part IV - Squared Logistic Regression Decision Boundary')
+plt.legend(bbox_to_anchor=(1, 0.5))
+plt.tight_layout() 
+plt.grid(False)
+plt.show()
