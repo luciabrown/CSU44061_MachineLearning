@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.svm import LinearSVC 
+from collections import Counter
 
 df = pd.read_csv("Week2Assignment/week2.php.csv",header=None,comment="#",sep=",",skipinitialspace=True)
 print(df.head())
@@ -88,6 +89,8 @@ plt.show()
 svcScoreDictionary={}
 cVals=[0.001,1,100]
 
+# https://youtu.be/joTa_FeMZ2s?si=3DI8TfqasbA9BtgO
+# https://youtu.be/5oVQBF_p6kY?si=8PbeAmYH38awD8_9 
 modelZero =LinearSVC(C=0.001)
 modelOne=LinearSVC(C=1)
 modelHundred   =LinearSVC(C=100)
@@ -109,7 +112,7 @@ for cVal, model in models.items():
 
 print("\nScores for Linear SVC:", svcScoreDictionary)
 
-# PART II 
+# PART II - https://youtu.be/_YPScrckx28?si=fBxs_9gB27Ey7EYp
 # Use prediction on full X dataset, not just X_test
 y_pred_Zero=modelZero.predict(X)
 y_pred_One=modelOne.predict(X)
@@ -215,3 +218,14 @@ plt.legend(bbox_to_anchor=(1, 0.5))
 plt.tight_layout() 
 plt.grid(False)
 plt.show()
+
+# PART III - Add Baseline Comparison
+mostCommonClass = Counter(y_trainSquare).most_common(1)[0][0] # Most common class in training set
+
+# Predict most common class
+y_predBaseline = np.full_like(y_testSquare,fill_value=mostCommonClass)
+baselineAccuracy = accuracy_score(y_testSquare, y_predBaseline)
+print("Baseline Accuracy (majority class predictor):", round(baselineAccuracy, 2))
+print("Squared Logistic Regression Accuracy:", round(accuracySquare, 2))
+
+# PART IV - Create the decision boundary 
