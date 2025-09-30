@@ -29,42 +29,33 @@ plt.grid(False)
 plt.show()
 
 # PART II - https://youtube.com/shorts/8it0yrJzQfU?si=1UoVpwNGf7flDZeh
-# Test sizes from 0.1 to 0.95 in steps of 0.5
-test_sizes = np.arange(0.1, 1, 0.05)
-accuracy_dict = {}
-for ts in test_sizes:
-    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=ts,random_state=0)
 
-    classifier=LogisticRegression(random_state=0)
-    classifier.fit(X_train,y_train)
-    y_pred=classifier.predict(X_test)
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=0)
+X1_test = X_test[:, 0]
+X2_test = X_test[:, 1]
 
-    # Get model parameters
-    print("\nTest size: ",round(ts,2))
-    print("Intercept (b0):", classifier.intercept_[0])
-    print("Coefficients (b1, b2):", classifier.coef_[0])
+classifier=LogisticRegression(random_state=0)
+classifier.fit(X_train,y_train)
+y_pred=classifier.predict(X_test)
 
-    for i, coef in enumerate(classifier.coef_[0]):
-        effect = "increases" if coef > 0 else "decreases"
-        print(f"Feature X{i+1} {effect} the probability of predicting +1 (coefficient={coef:.3f})")
+# Get model parameters
+print("Intercept (b0):", classifier.intercept_[0])
+print("Coefficients (b1, b2):", classifier.coef_[0])
 
-    cm=confusion_matrix(y_test,y_pred)
-    print("Confusion Matrix:\n", cm)
-    print("Accuracy:", round(accuracy_score(y_test, y_pred),2))
-    accuracy_dict[round(ts, 2)] = round(accuracy_score(y_test, y_pred),2)
-print("\nAccuracy Dictionary",accuracy_dict)
+for i, coef in enumerate(classifier.coef_[0]):
+    effect = "increases" if coef > 0 else "decreases"
+    print(f"Feature X{i+1} {effect} the probability of predicting +1 (coefficient={coef:.3f})")
+
+print("Accuracy:", round(accuracy_score(y_test, y_pred),2))
 
 # PART III - https://youtu.be/ZsM2z0pTbnk?si=iMnwQTl_QFWL7ani
-
-# Use prediction on full X dataset, not just X_test
-y_pred_full = classifier.predict(X)
 
 #Add predictions to plot
 plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1],X2[y==1],marker="+",color="lime",label="Target = +1")
 plt.scatter(X1[y==-1],X2[y==-1],marker="o",color="blue",label="Target = -1")
-plt.scatter(X1[(y == y_pred_full) & (y == 1)], X2[(y == y_pred_full) & (y == 1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted +1")
-plt.scatter(X1[(y == y_pred_full) & (y == -1)], X2[(y == y_pred_full) & (y == -1)], facecolors='none', edgecolors='darkred', s=100, label="Classifier Predicted -1")
+plt.scatter(X1_test[(y_test == y_pred) & (y_test == 1)], X2_test[(y_test == y_pred) & (y_test == 1)], facecolors='none', edgecolors='red', s=100, label="Classifier Predicted +1")
+plt.scatter(X1_test[(y_test == y_pred) & (y_test == -1)], X2_test[(y_test == y_pred) & (y_test == -1)], facecolors='none', edgecolors='darkred', s=100, label="Classifier Predicted -1")
 
 # Add decision boundary as line on plot
 b0 = classifier.intercept_[0]
@@ -91,12 +82,13 @@ cVals=[0.001,1,100]
 
 # https://youtu.be/joTa_FeMZ2s?si=3DI8TfqasbA9BtgO
 # https://youtu.be/5oVQBF_p6kY?si=8PbeAmYH38awD8_9 
+X_train_SVM,X_test_SVM,y_train_SVM,y_test_SVM = train_test_split(X,y,test_size=0.2,random_state=0)
 modelZero =LinearSVC(C=0.001)
 modelOne=LinearSVC(C=1)
-modelHundred   =LinearSVC(C=100)
-modelZero.fit(X_train, y_train)
-modelOne.fit(X_train, y_train)
-modelHundred.fit(X_train, y_train)
+modelHundred =LinearSVC(C=100)
+modelZero.fit(X_train_SVM, y_train_SVM)
+modelOne.fit(X_train_SVM, y_train_SVM)
+modelHundred.fit(X_train_SVM, y_train_SVM)
 models = {
     0.001: modelZero,
     1: modelOne,
@@ -104,19 +96,21 @@ models = {
 }
 
 for cVal, model in models.items():
-    svcScoreDictionary[round(cVal,3)] = round(model.score(X_test,y_test),2)
+    svcScoreDictionary[round(cVal,3)] = round(model.score(X_test_SVM,y_test_SVM),2)
+    X1_test_SVM = X_test_SVM[:, 0]
+    X2_test_SVM = X_test_SVM[:, 1]
     # Print model parameters
     print(f"\nLinear SVC Model for C = {cVal}")
-    print("Support vectors (first 5):\n", model.coef_[0][:5])
-    print("Intercept:", model.intercept_)
+    print("Model Coefficients:\n", model.coef_)
+    print("Model Intercept:", model.intercept_)
 
 print("\nScores for Linear SVC:", svcScoreDictionary)
 
 # PART II - https://youtu.be/_YPScrckx28?si=fBxs_9gB27Ey7EYp
-# Use prediction on full X dataset, not just X_test
-y_pred_Zero=modelZero.predict(X)
-y_pred_One=modelOne.predict(X)
-y_pred_Hundred=modelHundred.predict(X)
+
+y_pred_Zero=modelZero.predict(X_test_SVM)
+y_pred_One=modelOne.predict(X_test_SVM)
+y_pred_Hundred=modelHundred.predict(X_test_SVM)
 
 # PART III
 
@@ -140,11 +134,12 @@ x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals_Hundred = -(b0_hundred + b1_hundred * x_vals) / b2_hundred
 
 
+# PLOT C=0.001
 plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
-plt.scatter(X1[(y == y_pred_Zero) & (y == 1)], X2[(y == y_pred_Zero) & (y == 1)],facecolors='none', edgecolors='orange', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_Zero) & (y == -1)], X2[(y == y_pred_Zero) & (y == -1)],facecolors='none', edgecolors='darkorange', s=100, label="Predicted -1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == 1)], X2_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == 1)],facecolors='none', edgecolors='orange', s=100, label="Predicted +1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == -1)], X2_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == -1)],facecolors='none', edgecolors='darkorange', s=100, label="Predicted -1")
 plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=0.001")
 plt.xlabel("X1")
 plt.ylabel("X2")
@@ -154,11 +149,12 @@ plt.grid(False)
 plt.tight_layout() 
 plt.show()
 
+# PLOT C=1
 plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
-plt.scatter(X1[(y == y_pred_One) & (y == 1)], X2[(y == y_pred_One) & (y == 1)],facecolors='none', edgecolors='gold', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_One) & (y == -1)], X2[(y == y_pred_One) & (y == -1)],facecolors='none', edgecolors='yellow', s=100, label="Predicted -1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == 1)], X2_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == 1)],facecolors='none', edgecolors='gold', s=100, label="Predicted +1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == -1)], X2_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == -1)],facecolors='none', edgecolors='yellow', s=100, label="Predicted -1")
 plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=1")
 plt.xlabel("X1")
 plt.ylabel("X2")
@@ -168,11 +164,12 @@ plt.grid(False)
 plt.tight_layout() 
 plt.show()
 
+# PLOT C=100
 plt.figure(figsize=(12,12))
 plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
-plt.scatter(X1[(y == y_pred_Hundred) & (y == 1)], X2[(y == y_pred_Hundred) & (y == 1)],facecolors='none', edgecolors='brown', s=100, label="Predicted +1")
-plt.scatter(X1[(y == y_pred_Hundred) & (y == -1)], X2[(y == y_pred_Hundred) & (y == -1)],facecolors='none', edgecolors='fuchsia', s=100, label="Predicted -1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == 1)], X2_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == 1)],facecolors='none', edgecolors='brown', s=100, label="Predicted +1")
+plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == -1)], X2_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == -1)],facecolors='none', edgecolors='fuchsia', s=100, label="Predicted -1")
 plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=100")
 plt.xlabel("X1")
 plt.ylabel("X2")
@@ -196,7 +193,6 @@ X2_test = X_testSquare[:, 1]
 
 classifierSquare=LogisticRegression(random_state=0)
 classifierSquare.fit(X_trainSquare,y_trainSquare)
-
 y_predSquare = classifierSquare.predict(X_testSquare)
 
 print("Squared Logistic Regression Model Parameters:")
