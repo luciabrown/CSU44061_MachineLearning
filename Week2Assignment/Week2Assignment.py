@@ -126,11 +126,7 @@ b1_hundred, b2_hundred = modelHundred.coef_[0]
 # Add decision boundary as line on plot
 x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals_Zero = -(b0_zero + b1_zero * x_vals) / b2_zero
-
-x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals_One = -(b0_one + b1_one * x_vals) / b2_one
-
-x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals_Hundred = -(b0_hundred + b1_hundred * x_vals) / b2_hundred
 
 
