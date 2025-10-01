@@ -10,7 +10,7 @@ from sklearn.svm import LinearSVC
 from collections import Counter
 
 df = pd.read_csv("Week2Assignment/week2.php.csv",header=None,comment="#",sep=",",skipinitialspace=True)
-print(df.head())
+#print(df.head())
 X1=df.iloc[:,0] # Col1
 X2=df.iloc[:,1] # Col2
 X=np.column_stack((X1,X2)) # Stack into 2D array
@@ -46,7 +46,7 @@ for i, coef in enumerate(classifier.coef_[0]):
     effect = "increases" if coef > 0 else "decreases"
     print(f"Feature X{i+1} {effect} the probability of predicting +1 (coefficient={coef:.3f})")
 
-print("Accuracy:", round(accuracy_score(y_test, y_pred),2))
+print("Accuracy of Logistical Regression:", round(accuracy_score(y_test, y_pred),7))
 
 # PART III - https://youtu.be/ZsM2z0pTbnk?si=iMnwQTl_QFWL7ani
 
@@ -96,7 +96,6 @@ models = {
 }
 
 for cVal, model in models.items():
-    svcScoreDictionary[round(cVal,3)] = round(model.score(X_test_SVM,y_test_SVM),2)
     X1_test_SVM = X_test_SVM[:, 0]
     X2_test_SVM = X_test_SVM[:, 1]
     # Print model parameters
@@ -104,13 +103,14 @@ for cVal, model in models.items():
     print("Model Coefficients:\n", model.coef_)
     print("Model Intercept:", model.intercept_)
 
-print("\nScores for Linear SVC:", svcScoreDictionary)
-
 # PART II - https://youtu.be/_YPScrckx28?si=fBxs_9gB27Ey7EYp
 
 y_pred_Zero=modelZero.predict(X_test_SVM)
 y_pred_One=modelOne.predict(X_test_SVM)
 y_pred_Hundred=modelHundred.predict(X_test_SVM)
+print("\nAccuracy Score for C=0.001: ",round(accuracy_score(y_test_SVM,y_pred_Zero),7))
+print("Accuracy Score for C=1: ",round(accuracy_score(y_test_SVM,y_pred_One),7))
+print("Accuracy Score for C=100: ",round(accuracy_score(y_test_SVM,y_pred_Hundred),7),"\n")
 
 # PART III
 
@@ -200,7 +200,7 @@ print("Intercept (b0):", classifierSquare.intercept_[0])
 print("Coefficients (b1, b2, b1^2, b2^2):", classifierSquare.coef_[0])
 
 accuracySquare = accuracy_score(y_testSquare, y_predSquare)
-print("Test Accuracy:", round(accuracySquare, 2))
+print("Test Accuracy:", round(accuracySquare, 7))
 
 # PART II
 # Original Data - NOT squared
@@ -242,7 +242,7 @@ plt.scatter(X1[y==1], X2[y==1], marker="+", color="lime", label="Target = +1")
 plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == 1)],facecolors='none', edgecolors='teal', s=100, label="Predicted +1")
 plt.scatter(X1_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)], X2_test[(y_testSquare == y_predSquare) & (y_testSquare == -1)],facecolors='none', edgecolors='aqua', s=100, label="Predicted -1")
 plt.scatter(X1[y==-1], X2[y==-1], marker="o", color="blue", label="Target = -1")
-plt.contour(X1_grid, X2_grid, prob, levels=[0.5], colors='black', linewidths=2, label="Decision Boundary for Squared Logistic Regression")
+plt.contour(X1_grid, X2_grid, prob, levels=[0.5], colors='black', linewidths=2)
 plt.xlabel('X1')
 plt.ylabel('X2')
 plt.title('Question C - Part IV - Squared Logistic Regression Decision Boundary')
