@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Lasso, Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.dummy import DummyRegressor
 
 df = pd.read_csv("Week3Assignment/week3.php.csv",header=None,comment="#",sep=",",skipinitialspace=True)
 X1=df.iloc[:,0] # Col1
@@ -15,7 +16,7 @@ X2=df.iloc[:,1] # Col2
 X=np.column_stack((X1,X2)) # Stack into 2D array
 y=df.iloc[:,2]  # Target vals
 
-# QUESTION A
+# -------------------------------- QUESTION I -----------------------------------------------------#
 fig = plt.figure()
 ax = fig.add_subplot(111,projection="3d")
 ax.scatter(X[:,0],X[:,1],y, c=X[:,0], cmap='cool', marker='o')
@@ -25,7 +26,7 @@ ax.set_zlabel('Target (y)')
 ax.set_title(f'Question A - Plotting of the Source Data')
 plt.show()
 
-# QUESTION B - https://youtu.be/LmpBt0tenJE?si=zjtD7zzyK3WANI1c
+# https://youtu.be/LmpBt0tenJE?si=zjtD7zzyK3WANI1c
 
 # Add extra polynomial features
 poly = PolynomialFeatures(degree=5, include_bias=False)
@@ -38,6 +39,15 @@ X_train_lasso, X_test_lasso, y_train_lasso, y_test_lasso = train_test_split(X_po
 scaler = StandardScaler()
 X_train_lasso = scaler.fit_transform(X_train_lasso)
 X_test_lasso = scaler.transform(X_test_lasso)
+
+# Baseline based on the data - always predict the mean
+dummyLasso = DummyRegressor(strategy="mean")
+dummyLasso.fit(X_train_lasso, y_train_lasso)
+y_pred_dummyLasso = dummyLasso.predict(X_test_lasso)
+print("\n----- BASELINE FOR LASSO (Mean) -----")
+print("MAE:", round(mean_absolute_error(y_test_lasso, y_pred_dummyLasso), 4))
+print("MSE:", round(mean_squared_error(y_test_lasso, y_pred_dummyLasso), 4))
+print("R²:", round(r2_score(y_test_lasso, y_pred_dummyLasso), 4))
 
 modelZeroLasso =Lasso(alpha=1/(2*0.001),random_state=1)
 modelOneLasso=Lasso(alpha=1/(2*1),random_state=1)
@@ -127,7 +137,6 @@ for idx, (C, y_pred_gridLasso) in enumerate(grid_predictionsLasso.items()):
 plt.tight_layout()
 plt.show()
 
-
 # RIDGE REGRESSION MODEL
 # train test split
 X_train_ridge, X_test_ridge, y_train_ridge, y_test_ridge = train_test_split(X_poly, y, test_size=0.2, random_state=0)
@@ -135,6 +144,15 @@ X_train_ridge, X_test_ridge, y_train_ridge, y_test_ridge = train_test_split(X_po
 # scale
 X_train_ridge = scaler.fit_transform(X_train_ridge)
 X_test_ridge = scaler.transform(X_test_ridge)
+
+dummyRidge = DummyRegressor(strategy="mean")
+dummyRidge.fit(X_train_ridge, y_train_ridge)
+y_pred_dummyRidge = dummyRidge.predict(X_test_ridge)
+print("\n----- BASELINE FOR RIDGE (Mean) -----")
+print("MAE:", round(mean_absolute_error(y_test_ridge, y_pred_dummyRidge), 4))
+print("MSE:", round(mean_squared_error(y_test_ridge, y_pred_dummyRidge), 4))
+print("R²:", round(r2_score(y_test_ridge, y_pred_dummyRidge), 4))
+
 
 modelZeroRidge = Ridge(alpha=1/(2*0.001), random_state=1)
 modelOneRidge = Ridge(alpha=1/(2*1), random_state=1)
@@ -204,4 +222,60 @@ for idx, (C, y_pred_gridRidge) in enumerate(grid_predictionsRidge.items()):
     ax.legend()
 
 plt.tight_layout()
+plt.show()
+
+# -------------------------------- QUESTION I END -----------------------------------------------------#
+# -------------------------------- QUESTION II -----------------------------------------------------#
+# Log spaced vlaues between 10^-2 and 10^3 to test high and low regularisation
+cValsLasso = np.logspace(-2, 3, 20)
+
+fiveFoldLasso = KFold(n_splits=5, shuffle=True, random_state=1)
+
+# compute cross-validated prediction error
+meanErrorLasso=[]
+standardDeviationLasso=[]
+
+for c in cValsLasso:
+    lassoModel =Lasso(alpha=1/(2*c),random_state=1,max_iter=10000)
+    lassoModelScores = cross_val_score(lassoModel, X_train_lasso, y_train_lasso, cv=fiveFoldLasso, scoring="neg_mean_squared_error")
+    lassoModelScores=-lassoModelScores
+    meanErrorLasso.append(lassoModelScores.mean())
+    standardDeviationLasso.append(lassoModelScores.std())
+
+# Plot mean std error vs C
+plt.figure(figsize=(8,6))
+plt.errorbar(cValsLasso, meanErrorLasso, yerr=standardDeviationLasso, fmt='-o', capsize=4, label="Mean: plus or minus 1 standard deviation",color="purple")
+plt.legend()
+plt.xscale('log')
+plt.xlabel("C (1 / (2*alpha))")
+plt.ylabel("Cross-validated MSE")
+plt.title("5-Fold Cross-Validation Error vs C for Lasso Regression")
+plt.grid(True, which="both", ls="--", lw=0.5)
+plt.show()
+
+# Ridge
+cValsRidge= np.logspace(-2, 3, 20)
+
+fiveFoldRidge = KFold(n_splits=5, shuffle=True, random_state=1)
+
+# compute cross-validated prediction error
+meanErrorRidge=[]
+standardDeviationRidge=[]
+
+for c in cValsRidge:
+    ridgeModel =Ridge(alpha=1/(2*c),random_state=1,max_iter=10000)
+    ridgeModelScores = cross_val_score(ridgeModel, X_train_ridge, y_train_ridge, cv=fiveFoldRidge, scoring="neg_mean_squared_error")
+    ridgeModelScores=-ridgeModelScores
+    meanErrorRidge.append(ridgeModelScores.mean())
+    standardDeviationRidge.append(ridgeModelScores.std())
+
+# Plot mean std error vs C
+plt.figure(figsize=(8,6))
+plt.errorbar(cValsRidge, meanErrorRidge, yerr=standardDeviationRidge, fmt='-o', capsize=4, label="Mean: plus or minus 1 standard deviation",color="fuchsia")
+plt.legend()
+plt.xscale('log')
+plt.xlabel("C (1 / (2*alpha))")
+plt.ylabel("Cross-validated MSE")
+plt.title("5-Fold Cross-Validation Error vs C for Ridge Regression")
+plt.grid(True, which="both", ls="--", lw=0.5)
 plt.show()
