@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Lasso, Ridge
