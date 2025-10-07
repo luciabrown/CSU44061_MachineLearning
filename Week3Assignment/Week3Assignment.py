@@ -241,7 +241,7 @@ for c in cValsLasso:
     meanErrorLasso.append(lassoModelScores.mean())
     standardDeviationLasso.append(lassoModelScores.std())
 
-# Plot mean std error vs C
+# Plot mean std error vs C - Plotting Cross-Validation
 plt.figure(figsize=(8,6))
 plt.errorbar(cValsLasso, meanErrorLasso, yerr=standardDeviationLasso, fmt='-o', capsize=4, label="Mean: plus or minus 1 standard deviation",color="purple")
 plt.legend()
@@ -268,7 +268,7 @@ for c in cValsRidge:
     meanErrorRidge.append(ridgeModelScores.mean())
     standardDeviationRidge.append(ridgeModelScores.std())
 
-# Plot mean std error vs C
+# Plot mean std error vs C  - Plotting Cross-Validation
 plt.figure(figsize=(8,6))
 plt.errorbar(cValsRidge, meanErrorRidge, yerr=standardDeviationRidge, fmt='-o', capsize=4, label="Mean: plus or minus 1 standard deviation",color="fuchsia")
 plt.legend()
