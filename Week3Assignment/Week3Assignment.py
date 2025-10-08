@@ -51,23 +51,27 @@ print("R²:", round(r2_score(y_test_lasso, y_pred_dummyLasso), 4))
 modelZeroLasso =Lasso(alpha=1/(2*0.001),random_state=1)
 modelOneLasso=Lasso(alpha=1/(2*1),random_state=1)
 modelHundredLasso =Lasso(alpha=1/(2*100),random_state=1)
+modelThousandLasso =Lasso(alpha=1/(2*1000),random_state=1)
 
 # fit models
 lasso_fitted_models = {
     0.001:modelZeroLasso.fit(X_train_lasso, y_train_lasso),
     1:modelOneLasso.fit(X_train_lasso, y_train_lasso),
-    100:modelHundredLasso.fit(X_train_lasso, y_train_lasso)
+    100:modelHundredLasso.fit(X_train_lasso, y_train_lasso),
+    1000:modelThousandLasso.fit(X_train_lasso, y_train_lasso)
 }
 
 # get predictions
 y_pred_ZeroLasso=modelZeroLasso.predict(X_test_lasso)
 y_pred_OneLasso=modelOneLasso.predict(X_test_lasso)
 y_pred_HundredLasso=modelHundredLasso.predict(X_test_lasso)
+y_pred_ThousandLasso=modelThousandLasso.predict(X_test_lasso)
 
 lasso_predictions = {
     0.001: y_pred_ZeroLasso,
     1: y_pred_OneLasso,
-    100: y_pred_HundredLasso
+    100: y_pred_HundredLasso,
+    1000: y_pred_ThousandLasso
 }
 
 for c,prediction in lasso_predictions.items():
@@ -119,7 +123,7 @@ X1_gridLasso, X2_gridLasso = np.meshgrid(grid_x1Lasso, grid_x2Lasso)
 fig = plt.figure(figsize=(18,5))
 
 for idx, (C, y_pred_gridLasso) in enumerate(grid_predictionsLasso.items()):
-    ax = fig.add_subplot(1, 3, idx+1, projection='3d')
+    ax = fig.add_subplot(1, 4, idx+1, projection='3d')
     
     # Plot Lasso predictions as surface
     ax.plot_surface(X1_gridLasso, X2_gridLasso, y_pred_gridLasso, alpha=0.6, cmap='viridis')
@@ -156,23 +160,27 @@ print("R²:", round(r2_score(y_test_ridge, y_pred_dummyRidge), 4))
 modelZeroRidge = Ridge(alpha=1/(2*0.001), random_state=1)
 modelOneRidge = Ridge(alpha=1/(2*1), random_state=1)
 modelHundredRidge = Ridge(alpha=1/(2*100), random_state=1)
+modelThousandRidge = Ridge(alpha=1/(2*1000), random_state=1)
 
 # Fit models
 ridge_fitted_models = {
     0.001: modelZeroRidge.fit(X_train_ridge, y_train_ridge),
     1: modelOneRidge.fit(X_train_ridge, y_train_ridge),
-    100: modelHundredRidge.fit(X_train_ridge, y_train_ridge)
+    100: modelHundredRidge.fit(X_train_ridge, y_train_ridge),
+    1000:modelThousandRidge.fit(X_train_ridge, y_train_ridge)
 }
 
 # Get predictions 
 y_pred_Zero = modelZeroRidge.predict(X_test_ridge)
 y_pred_One = modelOneRidge.predict(X_test_ridge)
 y_pred_Hundred = modelHundredRidge.predict(X_test_ridge)
+y_pred_Thousand = modelThousandRidge.predict(X_test_ridge)
 
 ridge_predictions = {
     0.001: y_pred_Zero,
     1: y_pred_One,
-    100: y_pred_Hundred
+    100: y_pred_Hundred,
+    1000: y_pred_Thousand
 }
 
 # Metrics
@@ -211,7 +219,7 @@ X1_gridRidge, X2_gridRidge = np.meshgrid(grid_x1Ridge, grid_x2Ridge)
 
 fig = plt.figure(figsize=(18,5))
 for idx, (C, y_pred_gridRidge) in enumerate(grid_predictionsRidge.items()):
-    ax = fig.add_subplot(1, 3, idx+1, projection='3d')
+    ax = fig.add_subplot(1, 4, idx+1, projection='3d')
     ax.plot_surface(X1_gridRidge, X2_gridRidge, y_pred_gridRidge, alpha=0.6, cmap='viridis')
     ax.scatter(X[:,0], X[:,1], y, color='red', label='Training Data')
     ax.set_xlabel('X1')
