@@ -258,7 +258,7 @@ plt.xlabel("C (1 / (2*alpha))")
 plt.ylabel("Cross-validated MSE")
 plt.title("5-Fold Cross-Validation Error vs C for Lasso Regression")
 plt.grid(True, which="both", ls="--", lw=0.5)
-plt.show()
+#plt.show()
 
 # Ridge
 cValsRidge= np.logspace(-2, 6, 20)
