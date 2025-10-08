@@ -23,7 +23,7 @@ ax.set_xlabel('X1')
 ax.set_ylabel('X2')
 ax.set_zlabel('Target (y)')
 ax.set_title(f'Question A - Plotting of the Source Data')
-plt.show()
+#plt.show()
 
 # https://youtu.be/LmpBt0tenJE?si=zjtD7zzyK3WANI1c
 
@@ -138,7 +138,7 @@ for idx, (C, y_pred_gridLasso) in enumerate(grid_predictionsLasso.items()):
     ax.legend()
 
 plt.tight_layout()
-plt.show()
+#plt.show()
 
 # RIDGE REGRESSION MODEL
 # train test split
@@ -229,12 +229,12 @@ for idx, (C, y_pred_gridRidge) in enumerate(grid_predictionsRidge.items()):
     ax.legend()
 
 plt.tight_layout()
-plt.show()
+#plt.show()
 
 # -------------------------------- QUESTION I END -----------------------------------------------------#
 # -------------------------------- QUESTION II -----------------------------------------------------#
 # Log spaced vlaues between 10^-2 and 10^3 to test high and low regularisation
-cValsLasso = np.logspace(-2, 3, 20)
+cValsLasso = np.logspace(-2, 6, 20)
 
 fiveFoldLasso = KFold(n_splits=5, shuffle=True, random_state=1)
 
@@ -261,7 +261,7 @@ plt.grid(True, which="both", ls="--", lw=0.5)
 plt.show()
 
 # Ridge
-cValsRidge= np.logspace(-2, 3, 20)
+cValsRidge= np.logspace(-2, 6, 20)
 
 fiveFoldRidge = KFold(n_splits=5, shuffle=True, random_state=1)
 
