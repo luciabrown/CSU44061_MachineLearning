@@ -17,7 +17,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score, KFold, train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score,f1_score, classification_report
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix,ConfusionMatrixDisplay
 from sklearn.neighbors import KNeighborsClassifier
 
 # Preprocessing - splitting the datasets apart
@@ -204,7 +204,7 @@ def modelVsBaselinePlot(model, baseline, X, y, title):
     # Plotting
     fig, axes = plt.subplots(1, 2, figsize=(14,6))
     
-    # Left: Logistic Regression
+    # Left: Logistic Regression or KNN
     # Decision boundary
     axes[0].contour(xx, yy, Z_model, levels=[0], colors='black', linewidths=2)
     # Training data
@@ -212,7 +212,7 @@ def modelVsBaselinePlot(model, baseline, X, y, title):
     axes[0].scatter(X[y==-1,0], X[y==-1,1], color='red', edgecolor='k', label='Class -1')
     axes[0].set_xlabel('X1')
     axes[0].set_ylabel('X2')
-    axes[0].set_title("Logistic Regression Model")
+    axes[0].set_title("Machine Learning Model")
     # Legend
     decisionBoundary = Line2D([0], [0], color='black', lw=2, label='Decision Boundary')
     axes[0].legend(handles=[mpatches.Patch(color='blue', label='Class +1'),mpatches.Patch(color='red', label='Class -1'),decisionBoundary], loc='best')
@@ -287,9 +287,9 @@ plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset
 plotPredictions(model2Logistical, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
 
 print("Dataset 1 — Logistic Regression Performance:")
-y_pred1 = predictAndMetrics(model1Logistical, X_test1, y_test1)
+predictAndMetrics(model1Logistical, X_test1, y_test1)
 print("Dataset 2 — Logistic Regression Performance:")
-y_pred2 = predictAndMetrics(model2Logistical, X_test2, y_test2)
+predictAndMetrics(model2Logistical, X_test2, y_test2)
 
 # Print coefficients for the model that was chosen
 def getParams(model,num):
@@ -336,10 +336,10 @@ for i, k in enumerate(kVals):
 
 # Find best K both datasets
 bestKVal1 = kVals[np.argmax(meanKScores1)]
-print(f"\nBest K value for Dataset 1: {bestKVal1:.4f}")
+print("\nBest K value for Dataset 1: ",bestKVal1)
 
 bestKVal2 = kVals[np.argmax(meanKScores2)]
-print(f"Best K value for Dataset 2: {bestKVal2:.4f}")
+print("Best K value for Dataset 2: ",bestKVal2)
 
 # Plot for Dataset 1
 plt.figure(figsize=(8,6))
@@ -366,3 +366,48 @@ plt.grid(True, which='both', ls='--', lw=0.5)
 bestKIndex2=np.argmax(meanKScores2)
 plt.scatter(kVals[bestKIndex2],meanKScores2[bestKIndex2], color='pink', edgecolor='lime', linewidth=2, s=80, zorder=5, label='Best K Value')
 plt.show()
+
+# Scaling & K Nearest Neighbours model fits using the best kval
+model1K = Pipeline([
+    ('scaler', StandardScaler()),
+    ('knn', KNeighborsClassifier(n_neighbors=bestKVal1))
+])
+model1K.fit(X_train1, y_train1)
+
+model2K = Pipeline([
+    ('scaler', StandardScaler()),
+    ('knn', KNeighborsClassifier(n_neighbors=bestKVal2))
+])
+model2K.fit(X_train2, y_train2)
+modelVsBaselinePlot(model1K, baseline1, X_train1, y_train1,"Dataset 1: K Nearest Neighbours vs Modal Baseline (Modal Result)")
+modelVsBaselinePlot(model2K, baseline2, X_train2, y_train2,"Dataset 2: K Nearest Neighbours vs Modal Baseline (Randomised Result)")
+# Dataset 1 prediction plot
+plotPredictions(model1K, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - K Nearest Neighbours Predictions with Decision Boundary")
+# Dataset 2 prediction plot
+plotPredictions(model2K, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - K Nearest Neighbours Predictions with Decision Boundary")
+print("Dataset 1 — K Nearest Neighbours Performance:")
+predictAndMetrics(model1K, X_test1, y_test1)
+print("Dataset 2 — K Nearest Neighbours Performance:")
+predictAndMetrics(model2K, X_test2, y_test2)
+
+# -------------------------------- QUESTION C -----------------------------------------------------#
+def confusionMatrix(model, X_test, y_test, name):
+    y_pred = model.predict(X_test)
+
+    acc = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='macro')
+    
+    print(f"\n{name} Performance:")
+    print(f"Accuracy: {acc:.3f}")
+    print(f"F1_macro: {f1:.3f}")
+    
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(cmap='Blues', values_format='d')
+    plt.title(name)
+    plt.show()
+    return cm
+
+confusionMatrix(model1Logistical,X_test1,y_test1,"CONFUSION MATRIX - Logistical Regression - Trained on the Valid/Non-Noisy Dataset")
+confusionMatrix(model1K,X_test1,y_test1,"CONFUSION MATRIX - K Nearest Neighbours - Trained on the Valid/Non-Noisy Dataset")
+confusionMatrix(baseline1,X_test1,y_test1,"CONFUSION MATRIX - Baseline 1 - Always Select the Modal Class")
