@@ -159,19 +159,19 @@ X_train1, X_test1, y_train1, y_test1 = train_test_split(dataset1_X, dataset1_y, 
 X_train2, X_test2, y_train2, y_test2 = train_test_split(dataset2_X, dataset2_y, test_size=0.2, random_state=42)
 
 # Scaling & Logistical Regression model fits using the best degree and best cval
-model1 = Pipeline([
+model1Logistical = Pipeline([
     ('poly', PolynomialFeatures(degree=bestDegree1, include_bias=False)),
     ('scaler', StandardScaler()),
     ('logreg', LogisticRegression(penalty='l2', C=bestCVal1, solver='lbfgs', max_iter=10000))
 ])
-model1.fit(X_train1, y_train1)
+model1Logistical.fit(X_train1, y_train1)
 
-model2 = Pipeline([
+model2Logistical = Pipeline([
     ('poly', PolynomialFeatures(degree=bestDegree2, include_bias=False)),
     ('scaler', StandardScaler()),
     ('logreg', LogisticRegression(penalty='l2', C=bestCVal2, solver='lbfgs', max_iter=10000))
 ])
-model2.fit(X_train2, y_train2)
+model2Logistical.fit(X_train2, y_train2)
 
 # Baselines
 
@@ -232,8 +232,8 @@ def modelVsBaselinePlot(model, baseline, X, y, title):
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
-modelVsBaselinePlot(model1, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
-modelVsBaselinePlot(model2, baseline2, X_train2, y_train2,"Dataset 2: Logistic Regression vs Modal Baseline (Randomised Result)")
+modelVsBaselinePlot(model1Logistical, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
+modelVsBaselinePlot(model2Logistical, baseline2, X_train2, y_train2,"Dataset 2: Logistic Regression vs Modal Baseline (Randomised Result)")
 
 # Helper function for the predictions
 def predictAndMetrics(model, X_test, y_test):
@@ -281,16 +281,29 @@ def plotPredictions(model, X_train, y_train, X_test, y_test, title):
     plt.show()
 
 # Dataset 1 prediction plot
-plotPredictions(model1, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
+plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
 # Dataset 2 prediction plot
-plotPredictions(model2, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
-
-
+plotPredictions(model2Logistical, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
 
 print("Dataset 1 — Logistic Regression Performance:")
-y_pred1 = predictAndMetrics(model1, X_test1, y_test1)
+y_pred1 = predictAndMetrics(model1Logistical, X_test1, y_test1)
 print("Dataset 2 — Logistic Regression Performance:")
-y_pred2 = predictAndMetrics(model2, X_test2, y_test2)
+y_pred2 = predictAndMetrics(model2Logistical, X_test2, y_test2)
 
-# Metrics: Accuracy, F1_macro
-# Print coefficients (optional)
+# Print coefficients for the model that was chosen
+def getParams(model,num):
+    poly = model.named_steps['poly']
+    params = model.named_steps['logreg']
+    
+    feature_names = poly.get_feature_names_out(['X1', 'X2'])
+    coefs = params.coef_.flatten()
+    intercept = params.intercept_[0]
+    
+    print(f"\nLOGISTIC REGRESSION PARAMETERS FOR DATASET {num} -  Best C={params.C} & Best Degree={poly.degree}")
+    print(f"Intercept: {intercept:.6f}")
+    for name, coef in zip(feature_names, coefs):
+        print(f"{name}: {coef:.6f}")
+
+# Print for both models
+getParams(model1Logistical,"1")
+getParams(model2Logistical,"2")
