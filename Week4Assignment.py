@@ -14,10 +14,11 @@ import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score, KFold, train_test_split
+from sklearn.model_selection import cross_val_score, KFold, train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score,f1_score, classification_report
+from sklearn.neighbors import KNeighborsClassifier
 
 # Preprocessing - splitting the datasets apart
 # ID of dataset_1.csv: # id:23--46--23-0,,
@@ -42,7 +43,7 @@ for i, df in enumerate(datasets):
     print(df)
     df.to_csv(f"dataset_{i+1}.csv", index=False, header=False)
 
-# -------------------------------- QUESTION I -----------------------------------------------------#
+# -------------------------------- QUESTION A -----------------------------------------------------#
 # Scatter plot of the two classes
 dataset1_df = pd.read_csv("dataset_1.csv",header=None,comment="#",sep=",",skipinitialspace=True)
 dataset1_X1=dataset1_df.iloc[:,0] # Col1
@@ -82,7 +83,7 @@ plt.show()
 fiveFoldPolynomialTest = KFold(n_splits=5, shuffle=True, random_state=1)
 
 # Define grid of hyperparameters
-degrees = [1, 2, 3, 4, 5, 6]  # test polynomial degrees
+degrees = list(range(1,7,1))  # test polynomial degrees
 cVals = np.logspace(-3, 3, 10)  # test C values
 
 # To store results
@@ -307,3 +308,61 @@ def getParams(model,num):
 # Print for both models
 getParams(model1Logistical,"1")
 getParams(model2Logistical,"2")
+
+# -------------------------------- QUESTION B-----------------------------------------------------#
+kVals=list(range(3,70,2)) # really high to avoid early convergence
+
+# To store results
+meanKScores1 = np.zeros(len(kVals))
+stdKScores1  = np.zeros(len(kVals))
+meanKScores2 = np.zeros(len(kVals))
+stdKScores2  = np.zeros(len(kVals))
+
+# Cross-validate
+for i, k in enumerate(kVals):
+    # Build pipeline
+    knnPipeline = Pipeline([
+        ('scaler',StandardScaler()),
+        ('knn',KNeighborsClassifier(n_neighbors=k))
+    ])
+
+    # Evaluate 5-fold for both datasets
+    kScores1 = cross_val_score(knnPipeline, dataset1_X, dataset1_y, cv=fiveFoldPolynomialTest, scoring='accuracy')
+    kScores2 = cross_val_score(knnPipeline, dataset2_X, dataset2_y, cv=fiveFoldPolynomialTest, scoring='accuracy')
+    meanKScores1[i] = kScores1.mean()
+    stdKScores1[i] = kScores1.std()
+    meanKScores2[i] = kScores2.mean()
+    stdKScores2[i] = kScores2.std()
+
+# Find best K both datasets
+bestKVal1 = kVals[np.argmax(meanKScores1)]
+print(f"\nBest K value for Dataset 1: {bestKVal1:.4f}")
+
+bestKVal2 = kVals[np.argmax(meanKScores2)]
+print(f"Best K value for Dataset 2: {bestKVal2:.4f}")
+
+# Plot for Dataset 1
+plt.figure(figsize=(8,6))
+for i, k in enumerate(kVals):
+    plt.errorbar(kVals, meanKScores1, yerr=stdKScores1,fmt='-o', capsize=4, label=f'K {k}')
+plt.xlabel('K')
+plt.ylabel('Mean 5-Fold Accuracy')
+plt.title('Question B - Cross-Validation for Dataset 1 - Maximum KValue Denoted as Pink Circle with Green Border')
+plt.grid(True, which='both', ls='--', lw=0.5)
+# Mark the best point
+bestKIndex1=np.argmax(meanKScores1)
+plt.scatter(kVals[bestKIndex1],meanKScores1[bestKIndex1], color='pink', edgecolor='lime', linewidth=2, s=80, zorder=5, label='Best K Value')
+plt.show()
+
+# Plot for Dataset 2
+plt.figure(figsize=(8,6))
+for i, k in enumerate(kVals):
+    plt.errorbar(kVals, meanKScores2, yerr=stdKScores2,fmt='-o', capsize=4, label=f'K {k}')
+plt.xlabel('K')
+plt.ylabel('Mean 5-Fold Accuracy')
+plt.title('Question B - Cross-Validation for Dataset 2 - Maximum KValue Denoted as Pink Circle with Green Border')
+plt.grid(True, which='both', ls='--', lw=0.5)
+# Mark the best point
+bestKIndex2=np.argmax(meanKScores2)
+plt.scatter(kVals[bestKIndex2],meanKScores2[bestKIndex2], color='pink', edgecolor='lime', linewidth=2, s=80, zorder=5, label='Best K Value')
+plt.show()
