@@ -14,10 +14,10 @@ import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score, KFold, train_test_split, GridSearchCV
+from sklearn.model_selection import cross_val_score, KFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix,ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score,f1_score, classification_report, confusion_matrix, roc_curve, auc,ConfusionMatrixDisplay
 from sklearn.neighbors import KNeighborsClassifier
 
 # Preprocessing - splitting the datasets apart
@@ -391,6 +391,7 @@ print("Dataset 2 — K Nearest Neighbours Performance:")
 predictAndMetrics(model2K, X_test2, y_test2)
 
 # -------------------------------- QUESTION C -----------------------------------------------------#
+#https://youtu.be/4jRBRDbJemM?si=X4780ygozX_mBXRi
 def confusionMatrix(model, X_test, y_test, name):
     y_pred = model.predict(X_test)
 
@@ -403,11 +404,59 @@ def confusionMatrix(model, X_test, y_test, name):
     
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot(cmap='Blues', values_format='d')
-    plt.title(name)
+
+    fig, ax = plt.subplots(figsize=(5, 4))
+    disp.plot(cmap="Blues", values_format="d", colorbar=False, ax=ax)
+
+    labels = [["True Negative", "False Positive"],["False Negative", "True Positive"]]
+    for (i, j), val in np.ndenumerate(cm):
+        ax.text(j, i + 0.25, labels[i][j], ha='center', va='top', fontsize=9, color='black')
+
+    # Style tweaks
+    ax.set_title(f"{name} — Confusion Matrix", pad=12)
+    ax.set_xlabel("Predicted Label")
+    ax.set_ylabel("True Label")
+    plt.tight_layout()
     plt.show()
+
+    return cm
+    
     return cm
 
 confusionMatrix(model1Logistical,X_test1,y_test1,"CONFUSION MATRIX - Logistical Regression - Trained on the Valid/Non-Noisy Dataset")
 confusionMatrix(model1K,X_test1,y_test1,"CONFUSION MATRIX - K Nearest Neighbours - Trained on the Valid/Non-Noisy Dataset")
 confusionMatrix(baseline1,X_test1,y_test1,"CONFUSION MATRIX - Baseline 1 - Always Select the Modal Class")
+
+# -------------------------------- QUESTION C -----------------------------------------------------#
+def rocCurve(models, X_test, y_test, title="ROC Curves Comparison"):
+    plt.figure(figsize=(8, 6))
+
+    for name, model in models.items():
+        if hasattr(model, "predict_proba"):
+            y_scores = model.predict_proba(X_test)[:, 1]
+        else:
+            y_scores = model.decision_function(X_test)
+            
+        fpr, tpr, _ = roc_curve(y_test, y_scores)
+        roc_auc = auc(fpr, tpr)
+        plt.plot(fpr, tpr, lw=2, label=f"{name} (AUC = {roc_auc:.3f})")
+    
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(title)
+    plt.legend(loc="lower right")
+    plt.grid(True, ls='--', lw=0.5)
+    plt.show()
+
+models_dataset1 = {
+    "Logistic Regression": model1Logistical,
+    "K-Nearest Neighbours": model1K,
+    "Baseline": baseline1
+}
+rocCurve(models_dataset1, X_test1, y_test1, title="Dataset 1 — ROC Curves")
+models_dataset2 = {
+    "Logistic Regression": model2Logistical,
+    "K-Nearest Neighbours": model2K,
+    "Baseline": baseline2
+}
+rocCurve(models_dataset2, X_test1, y_test1, title="Dataset 2 — ROC Curves")
