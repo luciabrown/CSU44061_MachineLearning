@@ -233,7 +233,7 @@ def modelVsBaselinePlot(model, baseline, X, y, title):
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
-modelVsBaselinePlot(model1Logistical, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
+#modelVsBaselinePlot(model1Logistical, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
 modelVsBaselinePlot(model2Logistical, baseline2, X_train2, y_train2,"Dataset 2: Logistic Regression vs Modal Baseline (Randomised Result)")
 
 # Helper function for the predictions
@@ -282,12 +282,12 @@ def plotPredictions(model, X_train, y_train, X_test, y_test, title):
     plt.show()
 
 # Dataset 1 prediction plot
-plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
+#plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
 # Dataset 2 prediction plot
 plotPredictions(model2Logistical, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
 
-print("Dataset 1 — Logistic Regression Performance:")
-predictAndMetrics(model1Logistical, X_test1, y_test1)
+#print("Dataset 1 — Logistic Regression Performance:")
+#predictAndMetrics(model1Logistical, X_test1, y_test1)
 print("Dataset 2 — Logistic Regression Performance:")
 predictAndMetrics(model2Logistical, X_test2, y_test2)
 
@@ -306,7 +306,7 @@ def getParams(model,num):
         print(f"{name}: {coef:.6f}")
 
 # Print for both models
-getParams(model1Logistical,"1")
+#getParams(model1Logistical,"1")
 getParams(model2Logistical,"2")
 
 # -------------------------------- QUESTION B-----------------------------------------------------#
@@ -392,40 +392,40 @@ predictAndMetrics(model2K, X_test2, y_test2)
 
 # -------------------------------- QUESTION C -----------------------------------------------------#
 #https://youtu.be/4jRBRDbJemM?si=X4780ygozX_mBXRi
-def confusionMatrix(model, X_test, y_test, name):
-    y_pred = model.predict(X_test)
+def confusionMatrix(baseline,logreg,knn, X_test, y_test, names):
+    models = [baseline, logreg, knn]
+    cms=[]
 
-    acc = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average='macro')
-    
-    print(f"\n{name} Performance:")
-    print(f"Accuracy: {acc:.3f}")
-    print(f"F1_macro: {f1:.3f}")
-    
-    cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+    for index, (model, name) in enumerate(zip(models, names)):
+        y_pred = model.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred, average='macro')
+        
+        print(f"\n{name} Performance:")
+        print(f"Accuracy: {acc:.3f}")
+        print(f"F1_macro: {f1:.3f}")
+        
+        cm = confusion_matrix(y_test, y_pred)
+        cms.append(cm)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot(cmap="Blues", values_format="d", colorbar=False, ax=axes[index])
 
-    fig, ax = plt.subplots(figsize=(5, 4))
-    disp.plot(cmap="Blues", values_format="d", colorbar=False, ax=ax)
+        labels = [["True Negative", "False Positive"],["False Negative", "True Positive"]]
+        for (i, j), val in np.ndenumerate(cm):
+            axes[index].text(j, i + 0.25, labels[i][j], ha='center', va='top', fontsize=9, color='black')
 
-    labels = [["True Negative", "False Positive"],["False Negative", "True Positive"]]
-    for (i, j), val in np.ndenumerate(cm):
-        ax.text(j, i + 0.25, labels[i][j], ha='center', va='top', fontsize=9, color='black')
-
-    # Style tweaks
-    ax.set_title(f"{name} — Confusion Matrix", pad=12)
-    ax.set_xlabel("Predicted Label")
-    ax.set_ylabel("True Label")
+        # Style tweaks
+        axes[index].set_title(name, pad=12)
+        axes[index].set_xlabel("Predicted Label")
+        if index==0:
+            axes[index].set_ylabel("True Label")
+    plt.suptitle('Question C - Confusion Matrices for Dataset 1',fontsize=16, y=1.05)
     plt.tight_layout()
     plt.show()
 
-    return cm
-    
-    return cm
-
-confusionMatrix(model1Logistical,X_test1,y_test1,"CONFUSION MATRIX - Logistical Regression - Trained on the Valid/Non-Noisy Dataset")
-confusionMatrix(model1K,X_test1,y_test1,"CONFUSION MATRIX - K Nearest Neighbours - Trained on the Valid/Non-Noisy Dataset")
-confusionMatrix(baseline1,X_test1,y_test1,"CONFUSION MATRIX - Baseline 1 - Always Select the Modal Class")
+    return cms
+confusionMatrix(baseline1,model1Logistical,model1K,X_test1,y_test1,["Baseline 1 - Always Select Modal Class","LogReg - Trained on the Valid/Non-Noisy Dataset","KNN - Trained on the Valid/Non-Noisy Dataset"])
 
 # -------------------------------- QUESTION C -----------------------------------------------------#
 def rocCurve(models, X_test, y_test, title="ROC Curves Comparison"):
