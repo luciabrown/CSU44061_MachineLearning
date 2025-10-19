@@ -1,12 +1,3 @@
-# In your assignments and projects, unless otherwise stated it
-# is mandatory to present cross-validation analysis to support
-# your choice of hyperparameter values.
-# reasonable baseline too
-
-# This assignment includes: 
-# feature selection, model selection, model training and evaluation. Not all datasets
-# are useful, e.g. sometimes the data measured fails to capture the important relationships
-# or is just too noisy. You now have the tools to analyse the data to uncover such problems.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -233,8 +224,8 @@ def modelVsBaselinePlot(model, baseline, X, y, title):
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
-#modelVsBaselinePlot(model1Logistical, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
-#modelVsBaselinePlot(model2Logistical, baseline2, X_train2, y_train2,"Dataset 2: Logistic Regression vs Modal Baseline (Randomised Result)")
+modelVsBaselinePlot(model1Logistical, baseline1, X_train1, y_train1,"Dataset 1: Logistic Regression vs Modal Baseline (Modal Result)")
+modelVsBaselinePlot(model2Logistical, baseline2, X_train2, y_train2,"Dataset 2: Logistic Regression vs Modal Baseline (Randomised Result)")
 
 # Helper function for the predictions
 def predictAndMetrics(model, X_test, y_test):
@@ -282,12 +273,12 @@ def plotPredictions(model, X_train, y_train, X_test, y_test, title):
     plt.show()
 
 # Dataset 1 prediction plot
-#plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
+plotPredictions(model1Logistical, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - Logistic Regression Predictions with Decision Boundary")
 # Dataset 2 prediction plot
-#plotPredictions(model2Logistical, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
+plotPredictions(model2Logistical, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - Logistic Regression Predictions with Decision Boundary")
 
-#print("Dataset 1 — Logistic Regression Performance:")
-#predictAndMetrics(model1Logistical, X_test1, y_test1)
+print("Dataset 1 — Logistic Regression Performance:")
+predictAndMetrics(model1Logistical, X_test1, y_test1)
 print("Dataset 2 — Logistic Regression Performance:")
 predictAndMetrics(model2Logistical, X_test2, y_test2)
 
@@ -306,7 +297,7 @@ def getParams(model,num):
         print(f"{name}: {coef:.6f}")
 
 # Print for both models
-#getParams(model1Logistical,"1")
+getParams(model1Logistical,"1")
 getParams(model2Logistical,"2")
 
 # -------------------------------- QUESTION B-----------------------------------------------------#
@@ -379,14 +370,14 @@ model2K = Pipeline([
     ('knn', KNeighborsClassifier(n_neighbors=bestKVal2))
 ])
 model2K.fit(X_train2, y_train2)
-#modelVsBaselinePlot(model1K, baseline1, X_train1, y_train1,"Dataset 1: K Nearest Neighbours vs Modal Baseline (Modal Result)")
-#modelVsBaselinePlot(model2K, baseline2, X_train2, y_train2,"Dataset 2: K Nearest Neighbours vs Modal Baseline (Randomised Result)")
+modelVsBaselinePlot(model1K, baseline1, X_train1, y_train1,"Dataset 1: K Nearest Neighbours vs Modal Baseline (Modal Result)")
+modelVsBaselinePlot(model2K, baseline2, X_train2, y_train2,"Dataset 2: K Nearest Neighbours vs Modal Baseline (Randomised Result)")
 # Dataset 1 prediction plot
-#plotPredictions(model1K, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - K Nearest Neighbours Predictions with Decision Boundary")
+plotPredictions(model1K, X_train1, y_train1, X_test1, y_test1, "Dataset 1 - K Nearest Neighbours Predictions with Decision Boundary")
 # Dataset 2 prediction plot
 plotPredictions(model2K, X_train2, y_train2, X_test2, y_test2, "Dataset 2 - K Nearest Neighbours Predictions with Decision Boundary")
 print("Dataset 1 — K Nearest Neighbours Performance:")
-#predictAndMetrics(model1K, X_test1, y_test1)
+predictAndMetrics(model1K, X_test1, y_test1)
 print("Dataset 2 — K Nearest Neighbours Performance:")
 predictAndMetrics(model2K, X_test2, y_test2)
 
@@ -424,8 +415,8 @@ def confusionMatrix(baseline,logreg,knn, X_test, y_test, names):
     plt.tight_layout()
     plt.show()
     return cms
-#confusionMatrix(baseline1,model1Logistical,model1K,X_test1,y_test1,["Baseline 1 - Always Select Modal Class","LogReg - Trained on the Valid/Non-Noisy Dataset","KNN - Trained on the Valid/Non-Noisy Dataset"])
-#confusionMatrix(baseline2,model2Logistical,model2K,X_test2,y_test2,["Baseline 2 - Random","LogReg - Trained on the Noise Dataset","KNN - Trained on the Noise Dataset"])
+confusionMatrix(baseline1,model1Logistical,model1K,X_test1,y_test1,["Baseline 1 - Always Select Modal Class","LogReg - Trained on the Valid/Non-Noisy Dataset","KNN - Trained on the Valid/Non-Noisy Dataset"])
+confusionMatrix(baseline2,model2Logistical,model2K,X_test2,y_test2,["Baseline 2 - Random","LogReg - Trained on the Noise Dataset","KNN - Trained on the Noise Dataset"])
 
 # -------------------------------- QUESTION C -----------------------------------------------------#
 def rocCurve(models, X_test, y_test, title="ROC Curves Comparison"):
@@ -453,10 +444,10 @@ models_dataset1 = {
     "K-Nearest Neighbours": model1K,
     "Baseline": baseline1
 }
-#rocCurve(models_dataset1, X_test1, y_test1, title="Dataset 1 — ROC Curves")
+rocCurve(models_dataset1, X_test1, y_test1, title="Dataset 1 — ROC Curves")
 models_dataset2 = {
     "Logistic Regression": model2Logistical,
     "K-Nearest Neighbours": model2K,
     "Baseline": baseline2
 }
-#rocCurve(models_dataset2, X_test1, y_test1, title="Dataset 2 — ROC Curves")
+rocCurve(models_dataset2, X_test1, y_test1, title="Dataset 2 — ROC Curves")
