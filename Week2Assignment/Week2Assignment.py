@@ -1,5 +1,4 @@
-# First line of the data file: # id:7-14-7 
-
+#First line of the data file: # id:7-14-7 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -58,7 +57,8 @@ b0 = classifier.intercept_[0]
 b1, b2 = classifier.coef_[0]
 x_vals = np.linspace(X1.min()-0.1, X1.max()+0.1, 200)
 y_vals = -(b0 + b1 * x_vals) / b2
-plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary for Logistic Regression Classifier")
+plt.plot(x_vals, y_vals, color='black', linewidth=1.5, label="Decision Boundary for Logistic 
+Regression Classifier")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question A - Part III")
@@ -128,7 +128,8 @@ edgecolors='orange', s=100, label="Predicted +1")
 plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == -1)], 
 X2_test_SVM[(y_test_SVM == y_pred_Zero) & (y_test_SVM == -1)],facecolors='none', 
 edgecolors='darkorange', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=0.001")
+plt.plot(x_vals, y_vals_Zero, color='black', linewidth=1.5, label="Decision Boundary for 
+Linear SVC Model where C=0.001")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=0.001")
@@ -146,7 +147,8 @@ edgecolors='gold', s=100, label="Predicted +1")
 plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == -1)], 
 X2_test_SVM[(y_test_SVM == y_pred_One) & (y_test_SVM == -1)],facecolors='none', 
 edgecolors='yellow', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=1")
+plt.plot(x_vals, y_vals_One, color='black', linewidth=1.5, label="Decision Boundary for Linear 
+SVC Model where C=1")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=1")
@@ -164,7 +166,8 @@ edgecolors='brown', s=100, label="Predicted +1")
 plt.scatter(X1_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == -1)], 
 X2_test_SVM[(y_test_SVM == y_pred_Hundred) & (y_test_SVM == -1)],facecolors='none', 
 edgecolors='fuchsia', s=100, label="Predicted -1")
-plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for Linear SVC Model where C=100")
+plt.plot(x_vals, y_vals_Hundred, color='black', linewidth=1.5, label="Decision Boundary for 
+Linear SVC Model where C=100")
 plt.xlabel("X1")
 plt.ylabel("X2")
 plt.title("Question B - Part III Where C=100")
